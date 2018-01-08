@@ -10,16 +10,32 @@ class SearchBook extends Component {
   }
 
   searchQuery = (query) => {
-    BooksAPI.search(query, 10).then((books) => {
-      this.setState({ books });
-    })
+    if (query)
+      BooksAPI.search(query, 10).then((books) => {
+        if (books && books.length > 0) {
+          books.map(book => {
+            book.shelf = 'none'
+            for(let b of this.props.shelfBooks) {
+              if (b.id === book.id) {
+                book.shelf = b.shelf
+                break;
+              }
+            }
+            return book;
+          })
+          this.setState({ books });
+        } else // if invalid responce
+          this.setState({ books: [] });
+      })
+    else // If empty query
+      this.setState({ books: [] });
   }
 
   render() {
     return (
       <div className = "search-books">
         <div className = "search-books-bar">
-          <Link to = "/" className="close-search" >Close</Link>
+          <Link to = "/" className = "close-search" >Close</Link>
           <div className = "search-books-input-wrapper">
             <input
               type = "text"
